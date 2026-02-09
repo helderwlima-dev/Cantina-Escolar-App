@@ -1,0 +1,5 @@
+{
+  "name": "Cantina Escolar App",
+  "description": "Um sistema de gestão de contas de alunos para cantina escolar, focado em rapidez no caixa e uso em celular, substituindo o caderno de fiado.",
+  "requestFramePermissions": []
+}
