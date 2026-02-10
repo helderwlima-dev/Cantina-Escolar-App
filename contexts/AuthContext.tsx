@@ -28,23 +28,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, []);
 
-  useEffect(() => {
-    fetchUser(); // Initial fetch
+ useEffect(() => {
+  fetchUser(); // Initial fetch
 
-    const { data: authListener } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        if (event === 'SIGNED_IN') {
-          setUser(session?.user || null);
-        } else if (event === 'SIGNED_OUT') {
-          setUser(null);
-        }
-        setLoading(false);
+  const { data: authListener } = supabase.auth.onAuthStateChange(
+    (event, session) => {
+      if (event === 'SIGNED_IN') {
+        setUser(session?.user || null);
+      } else if (event === 'SIGNED_OUT') {
+        setUser(null);
       }
-    );
+      setLoading(false);
+    }
+  );
 
-    return () => {
-      authListener?.unsubscribe();
-    };
+  return () => {
+    authListener?.subscription?.unsubscribe();
+  };
+}, [fetchUser]);
+
   }, [fetchUser]);
 
   const signIn = async (email: string, password: string) => {
