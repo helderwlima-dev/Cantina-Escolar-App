@@ -28,25 +28,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, []);
 
- useEffect(() => {
-  fetchUser(); // Initial fetch
+  useEffect(() => {
+    fetchUser(); // Initial fetch
 
-  const { data: authListener } = supabase.auth.onAuthStateChange(
-    (event, session) => {
-      if (event === 'SIGNED_IN') {
-        setUser(session?.user || null);
-      } else if (event === 'SIGNED_OUT') {
-        setUser(null);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        if (event === 'SIGNED_IN') {
+          setUser(session?.user || null);
+        } else if (event === 'SIGNED_OUT') {
+          setUser(null);
+        }
+        setLoading(false);
       }
-      setLoading(false);
-    }
-  );
+    );
 
-  return () => {
-    authListener?.subscription?.unsubscribe();
-  };
-}, [fetchUser]);
-
+    return () => {
+      subscription?.unsubscribe();
+    };
   }, [fetchUser]);
 
   const signIn = async (email: string, password: string) => {
@@ -71,8 +69,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const value: AuthContextType = {
+    user,
+    loading,
+    signIn,
+    signOut
+  };
+
   return (
-    <AuthContext.Provider value={{ user, loading, signIn, signOut }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );
