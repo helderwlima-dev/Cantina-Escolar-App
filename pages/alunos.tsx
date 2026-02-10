@@ -1,17 +1,21 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { createClient } from '@supabase/supabase-js';
-console.log('SUPABASE_URL:', process.env.NEXT_PUBLIC_SUPABASE_URL);
-console.log('SERVICE_ROLE:', process.env.SUPABASE_SERVICE_ROLE_KEY ? 'OK' : 'MISSING');
 
-
-// ⚠️ essas variáveis precisam existir na Vercel e no .env.local
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY! // service role, NÃO anon
-);
-
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
   try {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+    if (!supabaseUrl || !serviceRoleKey) {
+      console.error('Variáveis do Supabase não encontradas');
+      return res.status(500).json({ message: 'Configuração do servidor inválida' });
+    }
+
+    const supabase = createClient(supabaseUrl, serviceRoleKey);
+
     // =========================
     // GET → listar alunos
     // =========================
@@ -66,7 +70,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             permite_fiado,
             saldo_baixo_limite,
             ativo,
-            saldo_atual: 0, // começa zerado
+            saldo_atual: 0,
           },
         ])
         .select()
